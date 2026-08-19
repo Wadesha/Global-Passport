@@ -1,644 +1,1023 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>全球通关 - Global Passport Achievements</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
-            padding: 20px;
-            margin: 0;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #fff;
-            margin-bottom: 5px; /* 减小主标题下边距 */
-            font-size: 2.5em;
-            text-shadow: 0 0 10px rgba(0, 150, 255, 0.7);
-        }
-        
-        .subtitle {
-            text-align: center;
-            color: #aaa;
-            margin-bottom: 5px; /* 减小副标题下边距 */
-            font-size: 1.4em;
-            font-weight: normal;
-        }
-        
-        .disclaimer {
-            text-align: center;
-            color: #777;
-            margin-bottom: 20px; /* 减小到统计信息的间距 */
-            font-size: 0.9em;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>环球护照 · 旅行模拟 Global Passport</title>
+<style>
+:root{
+  --bg:#12141a; --panel:#1c1f29; --panel2:#242836; --border:#3a4052;
+  --text:#e8ecf4; --dim:#9aa3b5; --faint:#6b7280;
+  --blue:#4fc3f7; --gold:#fdd835; --green:#66bb6a; --red:#ef5350; --orange:#ffa726;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+.hidden{display:none!important}
 
-        .overall-stats {
-            text-align: center;
-            color: #aaa;
-            margin-bottom: 30px;
-            font-size: 1.2em;
-        }
-        
-        .series-container {
-            margin-bottom: 20px;
-        }
-        
-        .series-header {
-            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
-            padding: 15px;
-            border-radius: 8px 8px 0 0; /* 只顶部圆角 */
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #555;
-            border-bottom: none; /* 与内容区合并 */
-        }
-        
-        .series-header:hover {
-            background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
-        }
-        
-        .series-title {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #4fc3f7;
-        }
-        
-        .series-stats {
-            font-size: 1.1em;
-            color: #aaa;
-        }
-        
-        .series-content {
-            padding: 15px;
-            background: #252525;
-            border-radius: 0 0 8px 8px; /* 只底部圆角 */
-            border: 1px solid #555;
-            border-top: none; /* 与头部合并 */
-            display: block; /* 默认显示 */
-        }
-        
-        .series-content.collapsed {
-            display: none; /* 折叠时隐藏 */
-        }
-        
-        .achievements-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        /* 响应式网格布局 */
-        @media (max-width: 768px) {
-            .achievements-grid {
-                grid-template-columns: 1fr; /* 手机端单列 */
-            }
-        }
-        
-        @media (min-width: 769px) and (max-width: 1200px) {
-            .achievements-grid {
-                grid-template-columns: repeat(2, 1fr); /* 平板端两列 */
-            }
-        }
-        
-        @media (min-width: 1201px) {
-            .achievements-grid {
-                grid-template-columns: repeat(3, 1fr); /* 桌面端三列 */
-            }
-        }
-        
-        /* 超大屏幕最多五列 */
-        @media (min-width: 1800px) {
-            .achievements-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        
-        @media (min-width: 2200px) {
-            .achievements-grid {
-                grid-template-columns: repeat(5, 1fr);
-            }
-        }
-        
-        .achievement-card {
-            background: linear-gradient(145deg, #2c2c2c, #1f1f1f);
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            align-items: flex-start;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            border: 1px solid #444;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .achievement-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 150, 255, 0.4);
-            background: linear-gradient(145deg, #333, #222);
-        }
-        
-        .achievement-card.active {
-            border: 2px solid #4fc3f7;
-            box-shadow: 0 0 15px rgba(79, 195, 247, 0.6);
-        }
-        
-        .achievement-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            margin-right: 15px;
-            object-fit: cover;
-            border: 2px solid #555;
-        }
-        
-        .achievement-content {
-            flex: 1;
-        }
-        
-        .achievement-title {
-            font-weight: bold;
-            font-size: 1.2em;
-            color: #4fc3f7;
-            margin-bottom: 5px;
-        }
-        
-        .achievement-description {
-            font-size: 0.9em;
-            color: #aaa;
-            line-height: 1.4;
-            margin-bottom: 8px;
-        }
-        
-        .achievement-statistics {
-            font-size: 0.8em;
-            color: #777;
-            text-align: right;
-        }
-        
-        .locked {
-            opacity: 0.5;
-        }
-        
-        .locked .achievement-title {
-            color: #777;
-        }
-        
-        .unlocked {
-            border: 1px solid #4fc3f7;
-        }
-    </style>
+/* ============ 开始界面 ============ */
+#start-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;background:radial-gradient(ellipse at top,#1b2438 0%,#12141a 60%)}
+#start-screen h1{font-size:3em;color:#fff;text-shadow:0 0 25px rgba(79,195,247,.8);margin-bottom:4px;letter-spacing:4px}
+.sub{color:var(--dim);margin-bottom:6px;font-size:1.15em}
+.hint{color:var(--faint);font-size:.85em;margin-bottom:24px}
+.flag-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:900px;margin-bottom:14px}
+.flag-card{width:130px;padding:12px 8px;background:var(--panel);border:1px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:.2s}
+.flag-card:hover{border-color:var(--blue);transform:translateY(-3px)}
+.flag-card.sel{border-color:var(--gold);box-shadow:0 0 14px rgba(253,216,53,.5)}
+.flag-dot{width:34px;height:24px;border-radius:4px;margin:0 auto 8px;border:1px solid rgba(255,255,255,.3)}
+.flag-card b{display:block;font-size:.95em;margin-bottom:2px}
+.flag-card small{color:var(--dim);font-size:.78em}
+.hukou-row{display:flex;gap:8px;margin:10px 0 18px}
+.hukou-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);color:var(--text)}
+.hukou-btn.sel{border-color:var(--gold);background:rgba(253,216,53,.15)}
+#btn-start{padding:14px 60px;font-size:1.25em;border:none;border-radius:30px;background:linear-gradient(135deg,#4fc3f7,#2979ff);color:#fff;font-weight:bold;box-shadow:0 4px 20px rgba(79,195,247,.4)}
+#btn-start:hover{filter:brightness(1.1)}
+#btn-continue{margin-top:12px;padding:10px 40px;font-size:1em;border-radius:30px;border:1px solid var(--gold);background:transparent;color:var(--gold)}
+#btn-continue:hover{background:rgba(253,216,53,.12)}
+
+/* ============ 游戏主界面 ============ */
+#game-screen{padding:12px}
+.topbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 16px;margin-bottom:10px}
+.topbar .title{font-size:1.2em;font-weight:bold;color:var(--blue);margin-right:8px}
+.stat{font-size:.95em;color:var(--text);background:var(--panel2);padding:5px 12px;border-radius:16px}
+.stat b{color:var(--gold)}
+.spacer{flex:1}
+.tbtn{padding:7px 14px;border-radius:18px;border:1px solid var(--border);background:var(--panel2);color:var(--text);font-size:.9em}
+.tbtn:hover{border-color:var(--blue)}
+.tbtn.gold{border-color:var(--gold);color:var(--gold)}
+
+.main{display:grid;grid-template-columns:1.25fr 1fr;gap:10px;height:calc(100vh - 90px);min-height:520px}
+@media(max-width:1000px){.main{grid-template-columns:1fr;height:auto}}
+.map-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative}
+.map-panel svg{width:100%;height:100%;display:block}
+.side-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+.tabs{display:flex;border-bottom:1px solid var(--border)}
+.tab{flex:1;padding:11px 0;text-align:center;background:transparent;border:none;color:var(--dim);font-size:.95em;border-bottom:2px solid transparent}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-body{flex:1;overflow-y:auto;padding:14px}
+.tab-body h3{margin-bottom:10px;color:var(--blue);font-size:1.05em}
+.city-info{background:var(--panel2);border-radius:10px;padding:12px;margin-bottom:10px}
+.city-info .nm{font-size:1.25em;font-weight:bold;color:var(--gold)}
+.city-info .meta{color:var(--dim);font-size:.88em;margin-top:4px}
+.btn{padding:9px 18px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);color:var(--text);font-size:.95em;margin:4px 4px 4px 0}
+.btn:hover{border-color:var(--blue)}
+.btn.primary{background:linear-gradient(135deg,#4fc3f7,#2979ff);border:none;color:#fff;font-weight:bold}
+.btn.gold{background:linear-gradient(135deg,#fdd835,#f39c12);border:none;color:#222;font-weight:bold}
+.btn.danger{background:linear-gradient(135deg,#ef5350,#d32f2f);border:none;color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.small{padding:5px 10px;font-size:.82em;border-radius:8px}
+
+/* 出行列表 */
+.dest-list{list-style:none;max-height:340px;overflow-y:auto}
+.dest-list li{padding:9px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:6px;cursor:pointer;background:var(--panel2);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dest-list li:hover{border-color:var(--blue)}
+.dest-list li.sel{border-color:var(--gold);background:rgba(253,216,53,.08)}
+.dest-list .dn{font-weight:bold}
+.dest-list .dm{color:var(--faint);font-size:.8em;text-align:right}
+.mode-row{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
+.mode-btn{padding:7px 12px;border-radius:18px;border:1px solid var(--border);background:var(--panel2);color:var(--dim);font-size:.85em}
+.mode-btn.sel{border-color:var(--blue);color:var(--blue);background:rgba(79,195,247,.12)}
+.purpose-row{display:flex;gap:6px;margin:8px 0}
+.purpose-btn{padding:6px 12px;border-radius:16px;border:1px solid var(--border);background:var(--panel2);color:var(--dim);font-size:.82em}
+.purpose-btn.sel{border-color:var(--green);color:var(--green)}
+
+/* 签证列表 */
+.visa-list{display:flex;flex-direction:column;gap:6px}
+.visa-item{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+.visa-item .vn{font-weight:bold;display:flex;align-items:center;gap:8px}
+.visa-dot{width:26px;height:18px;border-radius:3px;border:1px solid rgba(255,255,255,.25);display:inline-block}
+.visa-item .vt{font-size:.78em;color:var(--faint)}
+.visa-item.owned{opacity:.55}
+.tag{font-size:.72em;padding:2px 8px;border-radius:10px;border:1px solid}
+.tag.free{color:var(--green);border-color:var(--green)}
+.tag.arrival{color:var(--orange);border-color:var(--orange)}
+.tag.need{color:var(--red);border-color:var(--red)}
+.tag.owned{color:var(--gold);border-color:var(--gold)}
+
+/* 城市页 */
+.landmark-box{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}
+.landmark-box .lm{font-weight:bold;color:var(--orange)}
+.action-btns{margin-top:6px}
+
+/* 商店 */
+.shop-item{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}
+.shop-item h4{color:var(--gold);margin-bottom:4px}
+.shop-item p{color:var(--dim);font-size:.85em;margin-bottom:8px}
+.shop-item .cost{color:var(--orange);font-weight:bold}
+
+/* ============ 模态 ============ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(3px)}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;max-width:860px;width:92%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 50px rgba(0,0,0,.6)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border)}
+.modal-head h2{font-size:1.2em;color:var(--blue)}
+.modal-body{padding:18px 20px;overflow-y:auto}
+.close-btn{border:none;background:transparent;color:var(--dim);font-size:1.6em;line-height:1}
+.close-btn:hover{color:var(--red)}
+
+/* 护照 */
+.passport-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.passport-cover{background:linear-gradient(145deg,#1d4d2b,#0f351c);border:2px solid var(--gold);border-radius:14px;padding:18px;width:100%;max-width:520px}
+.passport-cover .ptitle{color:var(--gold);font-weight:bold;text-align:center;letter-spacing:6px;margin-bottom:14px;font-size:1.1em}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cell{aspect-ratio:1.35;border:1px dashed rgba(255,255,255,.25);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;font-size:.72em;text-align:center;padding:4px;min-height:74px}
+.cell .cd{width:100%;height:100%;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px}
+.cell .cd b{font-size:1em}
+.cell .cd small{font-size:.62em;opacity:.85;line-height:1.2;margin-top:2px;display:block}
+.cell.empty{color:var(--faint)}
+.cell.sel{border-color:var(--gold);box-shadow:0 0 12px rgba(253,216,53,.6)}
+.passport-tip{color:var(--dim);font-size:.82em;line-height:1.7;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;width:100%;max-width:520px}
+.passport-tip b{color:var(--gold)}
+
+/* 挑战墙 */
+.series-box{margin-bottom:12px}
+.series-head{background:linear-gradient(145deg,#2d3347,#222639);padding:12px 16px;border-radius:10px 10px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);border-bottom:none}
+.series-head h3{color:var(--blue)}
+.series-head .sc{color:var(--dim);font-size:.9em}
+.series-body{padding:12px;background:#1a1d27;border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px}
+.series-body.collapsed{display:none}
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.ach-card{background:linear-gradient(145deg,#262b3a,#1c1f2b);border:1px solid var(--border);border-radius:10px;padding:12px;opacity:.45;transition:.25s}
+.ach-card.unlocked{opacity:1;border-color:var(--blue);box-shadow:0 0 12px rgba(79,195,247,.35)}
+.ach-card .at{font-weight:bold;color:var(--dim);margin-bottom:4px;font-size:.95em}
+.ach-card.unlocked .at{color:var(--blue)}
+.ach-card .ad{font-size:.8em;color:var(--faint);line-height:1.45}
+.ach-card .ic{font-size:1.5em;margin-bottom:6px;filter:grayscale(1)}
+.ach-card.unlocked .ic{filter:none}
+
+/* 入境检查模态 */
+.entry-box{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.entry-box .big{font-size:1.3em;font-weight:bold;color:var(--gold);margin-bottom:4px}
+.entry-box .pol{font-size:.95em;margin:6px 0;color:var(--text)}
+.entry-box .fee{color:var(--orange);font-size:.9em}
+
+/* 通知 */
+#toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast-item{background:var(--panel2);border:1px solid var(--blue);color:var(--text);padding:10px 20px;border-radius:20px;font-size:.95em;box-shadow:0 4px 20px rgba(0,0,0,.5);animation:slideIn .3s}
+.toast-item.ach{border-color:var(--gold);color:var(--gold);font-weight:bold}
+.toast-item.err{border-color:var(--red);color:var(--red)}
+@keyframes slideIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+/* 胜利 */
+#victory{position:fixed;inset:0;z-index:200;background:rgba(10,12,18,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px}
+#victory h1{font-size:3.2em;color:var(--gold);text-shadow:0 0 30px rgba(253,216,53,.8);margin-bottom:10px}
+#victory p{color:var(--dim);font-size:1.15em;margin-bottom:26px}
+.victory-badge{font-size:5em;margin-bottom:8px}
+
+/* 滚动条 */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#3a4052;border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+
+.small-note{color:var(--faint);font-size:.78em;margin-top:8px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>全球通关</h1>
-        <div class="subtitle">Global Passport Achievements</div>
-        <div class="disclaimer">本页面使用AI生成，仅供娱乐</div>
-        <div class="disclaimer">单击成就可切换完成/关闭状态，单击系列标题可折叠/展开</div>
-        <div class="overall-stats" id="overall-stats">总体进度：0/0</div>
-        
-        <!-- 旅行家系列 -->
-        <div class="series-container">
-            <div class="series-header" onclick="toggleSeries('traveler')">
-                <div class="series-title">旅行家</div>
-                <div class="series-stats" id="traveler-stats">0/0</div>
-            </div>
-            <div class="series-content" id="traveler-content">
-                <div class="achievements-grid">
-                    <div class="achievement-card active unlocked" data-id="1" data-series="traveler">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%233d6b99'/%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23ffffff' stroke-width='5'/%3E%3Cg stroke='%23ffffff' stroke-width='3'%3E%3Cline x1='50' y1='10' x2='50' y2='20'/%3E%3Cline x1='50' y1='80' x2='50' y2='90'/%3E%3Cline x1='10' y1='50' x2='20' y2='50'/%3E%3Cline x1='80' y1='50' x2='90' y2='50'/%3E%3Cline x1='21.21' y1='21.21' x2='28.28' y2='28.28'/%3E%3Cline x1='71.72' y1='71.72' x2='78.79' y2='78.79'/%3E%3Cline x1='21.21' y1='78.79' x2='28.28' y2='71.72'/%3E%3Cline x1='71.72' y1='28.28' x2='78.79' y2='21.21'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='10' fill='%23fdd835'/%3E%3C/svg%3E" alt="五老星" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">五老星</div>
-                            <div class="achievement-description">拥有联合国五大常任理事国的签证</div>
-                            <div class="achievement-statistics">0.03%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="16" data-series="traveler">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%232E8B57'/%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23FFFFFF' stroke-width='2'/%3E%3Cg stroke='%23FFFFFF' stroke-width='1'%3E%3Cpath d='M50,10 C70,10 70,90 50,90'/%3E%3Cpath d='M50,10 C30,10 30,90 50,90'/%3E%3Cline x1='10' y1='50' x2='90' y2='50'/%3E%3Cline x1='50' y1='10' x2='50' y2='90'/%3E%3Cline x1='20' y1='20' x2='80' y2='80'/%3E%3Cline x1='80' y1='20' x2='20' y2='80'/%3E%3C/g%3E%3C/svg%3E" alt="环球旅行家" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">环球旅行家</div>
-                            <div class="achievement-description">访问过六大洲的所有国家</div>
-                            <div class="achievement-statistics">0.00005%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="17" data-series="traveler">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232E8B57'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23FFFFFF'/%3E%3Crect x='45' y='20' width='10' height='60' fill='%23000'/%3E%3Crect x='20' y='45' width='60' height='10' fill='%23000'/%3E%3C/svg%3E" alt="外交专家" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">外交专家</div>
-                            <div class="achievement-description">获得所有免签国家的入境许可</div>
-                            <div class="achievement-statistics">0.00003%的人拥有此成就</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 冷战风云系列 -->
-        <div class="series-container">
-            <div class="series-header" onclick="toggleSeries('cold-war')">
-                <div class="series-title">冷战风云</div>
-                <div class="series-stats" id="cold-war-stats">0/0</div>
-            </div>
-            <div class="series-content" id="cold-war-content">
-                <div class="achievements-grid">
-                    <div class="achievement-card active unlocked" data-id="7" data-series="cold-war">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23808080'/%3E%3Crect x='40' y='10' width='20' height='80' fill='%23000'/%3E%3Crect x='0' y='0' width='40' height='100' fill='%230000FF'/%3E%3Crect x='60' y='0' width='40' height='100' fill='%23FF0000'/%3E%3C/svg%3E" alt="柏林墙" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">柏林墙</div>
-                            <div class="achievement-description">拥有民主德国与联邦德国贴纸签证，且左右相邻</div>
-                            <div class="achievement-statistics">0.001%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card active unlocked" data-id="8" data-series="cold-war">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23006400'/%3E%3Crect x='20' y='20' width='60' height='60' fill='%238B4513'/%3E%3Ccircle cx='50' cy='50' r='15' fill='%23FFD700'/%3E%3C/svg%3E" alt="飞地悖论" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">飞地悖论</div>
-                            <div class="achievement-description">拥有俄罗斯签证，且在加里宁格勒入境</div>
-                            <div class="achievement-statistics">0.04%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card active unlocked" data-id="5" data-series="cold-war">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='0' y='0' width='50' height='50' fill='%23FF0000'/%3E%3Crect x='50' y='0' width='50' height='50' fill='%230000FF'/%3E%3Crect x='0' y='50' width='50' height='50' fill='%230000FF'/%3E%3Crect x='50' y='50' width='50' height='50' fill='%23008000'/%3E%3Ccircle cx='50' cy='50' r='15' fill='%23008000'/%3E%3C/svg%3E" alt="海峡两岸" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">海峡两岸</div>
-                            <div class="achievement-description">同时拥有中国大陆签证和台湾地区签证</div>
-                            <div class="achievement-statistics">0.15%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card active unlocked" data-id="4" data-series="cold-war">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23b22234'/%3E%3Crect x='0' y='33' width='100' height='33' fill='%233c54a8'/%3E%3Crect x='0' y='0' width='100' height='33' fill='%23ffffff'/%3E%3Cpolygon points='50,30 30,70 70,70' fill='%23b22234'/%3E%3C/svg%3E" alt="红色幽灵" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">红色幽灵</div>
-                            <div class="achievement-description">同时拥有苏联签证和俄罗斯签证</div>
-                            <div class="achievement-statistics">0.05%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card active unlocked" data-id="3" data-series="cold-war">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='0' y='0' width='100' height='50' fill='%23b22234'/%3E%3Crect x='0' y='0' width='100' height='50' fill='%233c54a8'/%3E%3Ccircle cx='50' cy='25' r='15' fill='%23ffffff'/%3E%3Crect x='0' y='50' width='100' height='50' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='75' r='15' fill='%233c54a8'/%3E%3C/svg%3E" alt="三八线" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">三八线</div>
-                            <div class="achievement-description">拥有朝鲜和韩国贴纸签证，且上下相邻</div>
-                            <div class="achievement-statistics">0.02%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="18" data-series="cold-war">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%238B4513'/%3E%3Crect x='0' y='0' width='100' height='33' fill='%23FFD700'/%3E%3Crect x='0' y='33' width='100' height='33' fill='%23000000'/%3E%3Crect x='0' y='66' width='100' height='34' fill='%23FF0000'/%3E%3C/svg%3E" alt="上次来也没要护照啊" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">上次来也没要护照啊</div>
-                            <div class="achievement-description">持有中国护照，陆路经朝鲜入境韩国，并抵达首尔</div>
-                            <div class="achievement-statistics">0.00001%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card active unlocked" data-id="6" data-series="cold-war">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%23ff0000'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23000'/%3E%3Cpath d='M50 10 L50 90 M10 50 L90 50' stroke='%23fff' stroke-width='4'/%3E%3C/svg%3E" alt="石子击卫星" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">石子击卫星</div>
-                            <div class="achievement-description">同时拥有朝鲜和美国签证</div>
-                            <div class="achievement-statistics">0.01%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="9" data-series="cold-war">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFD700'/%3E%3Crect x='0' y='33' width='100' height='33' fill='%230000FF'/%3E%3Crect x='0' y='0' width='100' height='33' fill='%23000'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23FFFFFF'/%3E%3C/svg%3E" alt="未解之谜" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">未解之谜</div>
-                            <div class="achievement-description">拥有巴勒斯坦护照和以色列签证</div>
-                            <div class="achievement-statistics">0.0005%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card active unlocked" data-id="2" data-series="cold-war">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%238B4513'/%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23DAA520' stroke-width='5'/%3E%3Cg stroke='%23DAA520' stroke-width='3'%3E%3Cline x1='50' y1='10' x2='50' y2='20'/%3E%3Cline x1='50' y1='80' x2='50' y2='90'/%3E%3Cline x1='10' y1='50' x2='20' y2='50'/%3E%3Cline x1='80' y1='50' x2='90' y2='50'/%3E%3Cline x1='21.21' y1='21.21' x2='28.28' y2='28.28'/%3E%3Cline x1='71.72' y1='71.72' x2='78.79' y2='78.79'/%3E%3Cline x1='21.21' y1='78.79' x2='28.28' y2='71.72'/%3E%3Cline x1='71.72' y1='28.28' x2='78.79' y2='21.21'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='10' fill='%23CD853F'/%3E%3C/svg%3E" alt="五帝钱" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">五帝钱</div>
-                            <div class="achievement-description">拥有联合国五大常任理事国的签证、但是苏联、中华民国、法兰西第四共和国</div>
-                            <div class="achievement-statistics">0.01%的人拥有此成就</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 全球冲突系列 -->
-        <div class="series-container">
-            <div class="series-header" onclick="toggleSeries('global-conflict')">
-                <div class="series-title">全球冲突</div>
-                <div class="series-stats" id="global-conflict-stats">0/0</div>
-            </div>
-            <div class="series-content" id="global-conflict-content">
-                <div class="achievements-grid">
-                    <div class="achievement-card locked" data-id="19" data-series="global-conflict">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23006400'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23ffffff'/%3E%3Crect x='30' y='40' width='40' height='20' fill='%23000'/%3E%3Crect x='40' y='30' width='20' height='40' fill='%23000'/%3E%3C/svg%3E" alt="冬将军" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">冬将军</div>
-                            <div class="achievement-description">持有法国或德国护照前往俄罗斯，且在冬季结束前离境</div>
-                            <div class="achievement-statistics">0.0001%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="20" data-series="global-conflict">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%23FFD700'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23FF0000'/%3E%3Ccircle cx='50' cy='50' r='10' fill='%23FFFF00'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%23000'/%3E%3Cline x1='50' y1='10' x2='50' y2='90' stroke='%23000' stroke-width='2'/%3E%3Cline x1='10' y1='50' x2='90' y2='50' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E" alt="二次原" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">二次原</div>
-                            <div class="achievement-description">持有美国护照/签证从长崎入境，随后前往广岛</div>
-                            <div class="achievement-statistics">0.00002%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="21" data-series="global-conflict">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23000080'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23FFD700'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23FF0000'/%3E%3Ccircle cx='50' cy='50' r='10' fill='%23FFFF00'/%3E%3C/svg%3E" alt="虎！虎！虎！" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">虎！虎！虎！</div>
-                            <div class="achievement-description">持有日本护照/签证，入境夏威夷</div>
-                            <div class="achievement-statistics">0.00003%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="22" data-series="global-conflict">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFD700'/%3E%3Crect x='0' y='0' width='100' height='50' fill='%230057B7'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%230057B7'/%3E%3Ccircle cx='50' cy='50' r='10' fill='%23FFD700'/%3E%3C/svg%3E" alt="克里米亚危机" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">克里米亚危机</div>
-                            <div class="achievement-description">申请乌克兰签证时，提交了俄罗斯的邀请函</div>
-                            <div class="achievement-statistics">0.0003%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="23" data-series="global-conflict">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23DC143C'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23FFFFFF'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23DC143C'/%3E%3Ccircle cx='50' cy='50' r='10' fill='%23FFFFFF'/%3E%3C/svg%3E" alt="特别军事行动" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">特别军事行动</div>
-                            <div class="achievement-description">申请俄罗斯签证时，提交了乌克兰的邀请函</div>
-                            <div class="achievement-statistics">0.0002%的人拥有此成就</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 不走寻常路系列 -->
-        <div class="series-container">
-            <div class="series-header" onclick="toggleSeries('unusual-path')">
-                <div class="series-title">不走寻常路</div>
-                <div class="series-stats" id="unusual-path-stats">0/0</div>
-            </div>
-            <div class="series-content" id="unusual-path-content">
-                <div class="achievements-grid">
-                    <div class="achievement-card locked" data-id="24" data-series="unusual-path">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffffff'/%3E%3Cpath d='M20,50 Q50,20 80,50 T20,50' fill='%23FFA500'/%3E%3C/svg%3E" alt="Taco Amigo" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">Taco Amigo</div>
-                            <div class="achievement-description">从美国入境墨西哥</div>
-                            <div class="achievement-statistics">0.00004%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card active unlocked" data-id="10" data-series="unusual-path">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23008000'/%3E%3Cellipse cx='50' cy='60' rx='20' ry='15' fill='%23006400'/%3E%3Ccircle cx='45' cy='45' r='5' fill='%23000'/%3E%3Ccircle cx='55' cy='45' r='5' fill='%23000'/%3E%3Cpath d='M40 70 Q50 80 60 70' stroke='%23000' stroke-width='2' fill='none'/%3E%3C/svg%3E" alt="两大强国伺候我一个人" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">两大强国伺候我一个人</div>
-                            <div class="achievement-description">作为台湾居民，同时拥有中国大陆台胞证和美国国籍</div>
-                            <div class="achievement-statistics">0.0001%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="14" data-series="unusual-path">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%234a235a'/%3E%3Crect x='20' y='20' width='60' height='60' fill='%23ffffff'/%3E%3Ctext x='50' y='55' font-size='12' fill='%23000' text-anchor='middle'> diplomat </text>%3C/svg%3E" alt="临时工" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">临时工</div>
-                            <div class="achievement-description">以临时工作签证入境，担任外交官</div>
-                            <div class="achievement-statistics">0.0001%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="25" data-series="unusual-path">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23800000'/%3E%3Crect x='0' y='0' width='100' height='50' fill='%23FFFF00'/%3E%3Crect x='0' y='50' width='100' height='50' fill='%230000FF'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23FFFFFF'/%3E%3C/svg%3E" alt="漏网之鱼" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">漏网之鱼</div>
-                            <div class="achievement-description">没有美国签证但从墨西哥入境</div>
-                            <div class="achievement-statistics">0.00005%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="26" data-series="unusual-path">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23006400'/%3E%3Crect x='20' y='20' width='20' height='20' fill='%23FFFF00'/%3E%3Crect x='60' y='20' width='20' height='20' fill='%23FFFF00'/%3E%3Crect x='20' y='60' width='20' height='20' fill='%23FFFF00'/%3E%3Crect x='60' y='60' width='20' height='20' fill='%23FFFF00'/%3E%3C/svg%3E" alt="妈祖同意了" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">妈祖同意了</div>
-                            <div class="achievement-description">拥有福建、广东或海南户籍，无签证入境非免签国家</div>
-                            <div class="achievement-statistics">0.00006%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="15" data-series="unusual-path">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23000080'/%3E%3Cpath d='M50,10 L50,90 M10,50 L90,50' stroke='%23ffffff' stroke-width='5'/%3E%3C/svg%3E" alt="无国界" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">无国界</div>
-                            <div class="achievement-description">护照上盖满所有国家的入境章，但实际从未离开过机场</div>
-                            <div class="achievement-statistics">0.0001%的人拥有此成就</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 幻想时刻系列 -->
-        <div class="series-container">
-            <div class="series-header" onclick="toggleSeries('fantasy-time')">
-                <div class="series-title">幻想时刻</div>
-                <div class="series-stats" id="fantasy-time-stats">0/0</div>
-            </div>
-            <div class="series-content" id="fantasy-time-content">
-                <div class="achievements-grid">
-                    <div class="achievement-card locked" data-id="27" data-series="fantasy-time">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FF0000'/%3E%3Cpolygon points='50,20 20,80 80,80' fill='%23FFD700'/%3E%3C/svg%3E" alt="红色警戒" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">红色警戒</div>
-                            <div class="achievement-description">持有苏联护照/签证，从纽约入境美国，且乘坐航空器游览自由女神像</div>
-                            <div class="achievement-statistics">0.00001%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="28" data-series="fantasy-time">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='0' y='0' width='100' height='50' fill='%23FFFFFF'/%3E%3Crect x='0' y='50' width='100' height='50' fill='%23FF0000'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23FF0000'/%3E%3C/svg%3E" alt="红色警戒3" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">红色警戒3</div>
-                            <div class="achievement-description">持有日本护照/签证，入境苏联/俄罗斯，且游览沃尔库塔</div>
-                            <div class="achievement-statistics">0.00002%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="29" data-series="fantasy-time">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2300008B'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23FFFFFF'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23FFD700'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23000'/%3E%3C/svg%3E" alt="西洋" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">西洋</div>
-                            <div class="achievement-description">持有中国护照，沿海路经好望角到达贝尔法斯特</div>
-                            <div class="achievement-statistics">0.00003%的人拥有此成就</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 精罗落泪系列 -->
-        <div class="series-container">
-            <div class="series-header" onclick="toggleSeries('byzantine-tears')">
-                <div class="series-title">精罗落泪</div>
-                <div class="series-stats" id="byzantine-tears-stats">0/0</div>
-            </div>
-            <div class="series-content" id="byzantine-tears-content">
-                <div class="achievements-grid">
-                    <div class="achievement-card locked" data-id="30" data-series="byzantine-tears">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23800080'/%3E%3Cpath d='M50 10 L50 90 M20 50 L80 50' stroke='%23FFD700' stroke-width='10'/%3E%3C/svg%3E" alt="他将如闪电般归来" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">他将如闪电般归来</div>
-                            <div class="achievement-description">持有希腊护照/签证，从伊斯坦布尔入境土耳其</div>
-                            <div class="achievement-statistics">0.002%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="31" data-series="byzantine-tears">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23800080'/%3E%3Cpolygon points='50,80 20,20 80,20' fill='%23FFD700'/%3E%3C/svg%3E" alt="我来，我见，我征服" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">我来，我见，我征服</div>
-                            <div class="achievement-description">持有意大利护照/签证入境土耳其</div>
-                            <div class="achievement-statistics">0.00004%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="32" data-series="byzantine-tears">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23800080'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23FFD700'/%3E%3C/svg%3E" alt="迦太基必须灭亡" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">迦太基必须灭亡</div>
-                            <div class="achievement-description">持有意大利护照/签证入境突尼斯，并在地上撒盐</div>
-                            <div class="achievement-statistics">0.00005%的人拥有此成就</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 探索时代系列 -->
-        <div class="series-container">
-            <div class="series-header" onclick="toggleSeries('exploration-era')">
-                <div class="series-title">探索时代</div>
-                <div class="series-stats" id="exploration-era-stats">0/0</div>
-            </div>
-            <div class="series-content" id="exploration-era-content">
-                <div class="achievements-grid">
-                    <div class="achievement-card locked" data-id="33" data-series="exploration-era">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230000FF'/%3E%3Cpolygon points='50,20 30,60 70,60' fill='%23FFFFFF'/%3E%3Ccircle cx='50' cy='50' r='15' fill='%23FFFFFF'/%3E%3Cpath d='M40,70 A10,10 0 1,0 60,70 A10,10 0 1,0 40,70' fill='%23FFFFFF'/%3E%3C/svg%3E" alt="金帐汗国" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">金帐汗国</div>
-                            <div class="achievement-description">持有蒙古护照/签证，沿陆路到达莫斯科</div>
-                            <div class="achievement-statistics">0.00006%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="34" data-series="exploration-era">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23006400'/%3E%3Crect x='0' y='0' width='100' height='33' fill='%23FFFFFF'/%3E%3Crect x='0' y='67' width='100' height='33' fill='%23FF0000'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23000'/%3E%3C/svg%3E" alt="逆向殖民" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">逆向殖民</div>
-                            <div class="achievement-description">持有拉美/非洲/英联邦国家护照或签证，入境西班牙/法国/英国本土</div>
-                            <div class="achievement-statistics">0.00007%的人拥有此成就</div>
-                        </div>
-                    </div>
-                    
-                    <div class="achievement-card locked" data-id="35" data-series="exploration-era">
-                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFD700'/%3E%3Crect x='0' y='0' width='100' height='10' fill='%23FF0000'/%3E%3Crect x='0' y='90' width='100' height='10' fill='%23FF0000'/%3E%3C/svg%3E" alt="四大总督区" class="achievement-icon">
-                        <div class="achievement-content">
-                            <div class="achievement-title">四大总督区</div>
-                            <div class="achievement-description">游览拉丁美洲的所有国家</div>
-                            <div class="achievement-statistics">0.00008%的人拥有此成就</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+<!-- ============ 开始界面 ============ -->
+<div id="start-screen">
+  <div style="font-size:4em;margin-bottom:6px">🌍</div>
+  <h1>环球护照</h1>
+  <div class="sub">Global Passport · 旅行模拟挑战</div>
+  <div class="hint">选择你的护照，踏上环球之旅，完成 32 项史诗级旅行成就</div>
+  <div style="color:var(--dim);font-size:.9em;margin-bottom:10px">选择出生地与护照</div>
+  <div class="flag-row" id="flag-row"></div>
+  <div id="hukou-wrap" class="hidden" style="text-align:center">
+    <div style="color:var(--dim);font-size:.88em;margin-bottom:6px">选择户籍（影响部分成就）</div>
+    <div class="hukou-row" id="hukou-row" style="justify-content:center"></div>
+  </div>
+  <button id="btn-start">✈️ 出发</button>
+  <button id="btn-continue" class="hidden">继续上次旅程</button>
+</div>
+
+<!-- ============ 游戏主界面 ============ -->
+<div id="game-screen" class="hidden">
+  <div class="topbar">
+    <span class="title">🌍 环球护照</span>
+    <span class="stat">💰 <b id="s-money">0</b></span>
+    <span class="stat">📅 <b id="s-date"></b></span>
+    <span class="stat">📍 <b id="s-city"></b></span>
+    <span class="stat">🏅 <b id="s-progress">0/32</b></span>
+    <span class="spacer"></span>
+    <button class="tbtn" onclick="openPassport()">📖 护照</button>
+    <button class="tbtn gold" onclick="openChallenges()">🏆 挑战 <span id="s-progress2">0</span>/32</button>
+    <button class="tbtn" onclick="saveGame()">💾 存档</button>
+    <button class="tbtn" onclick="confirmNewGame()">🔄 重开</button>
+  </div>
+  <div class="main">
+    <div class="map-panel" id="map-panel">
+      <svg id="world-map" viewBox="0 0 1160 620" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const achievementCards = document.querySelectorAll('.achievement-card');
-            const overallStatsElement = document.getElementById('overall-stats');
-            
-            // 计算初始统计
-            updateAllStats();
-            
-            achievementCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    // 切换激活状态
-                    this.classList.toggle('active');
-                    
-                    // 根据激活状态切换locked/unlocked类
-                    if(this.classList.contains('active')) {
-                        this.classList.remove('locked');
-                        this.classList.add('unlocked');
-                        // 更新边框样式
-                        this.style.border = '1px solid #4fc3f7';
-                    } else {
-                        this.classList.remove('unlocked');
-                        this.classList.add('locked');
-                        // 更新边框样式
-                        this.style.border = '1px solid #444';
-                    }
-                    
-                    // 更新统计
-                    updateAllStats();
-                });
-            });
-            
-            function updateAllStats() {
-                // 总体统计
-                const totalAchievements = achievementCards.length;
-                const unlockedTotal = document.querySelectorAll('.achievement-card.unlocked').length;
-                overallStatsElement.textContent = `总体进度：${unlockedTotal}/${totalAchievements}`;
-                
-                // 各系列统计
-                const seriesList = ['traveler', 'cold-war', 'global-conflict', 'unusual-path', 'fantasy-time', 'byzantine-tears', 'exploration-era'];
-                
-                seriesList.forEach(series => {
-                    const seriesCards = document.querySelectorAll(`.achievement-card[data-series="${series}"]`);
-                    const totalInSeries = seriesCards.length;
-                    const unlockedInSeries = document.querySelectorAll(`.achievement-card[data-series="${series}"].unlocked`).length;
-                    
-                    const seriesStatsElement = document.getElementById(`${series}-stats`);
-                    if(seriesStatsElement) {
-                        seriesStatsElement.textContent = `${unlockedInSeries}/${totalInSeries}`;
-                    }
-                });
-            }
-        });
-        
-        function toggleSeries(seriesId) {
-            const contentElement = document.getElementById(`${seriesId}-content`);
-            const headerElement = document.querySelector(`.series-header[onclick="toggleSeries('${seriesId}')"]`);
-            
-            if(contentElement.classList.contains('collapsed')) {
-                contentElement.classList.remove('collapsed');
-                headerElement.style.borderRadius = '8px 8px 0 0'; // 恢复顶部圆角
-            } else {
-                contentElement.classList.add('collapsed');
-                headerElement.style.borderRadius = '8px'; // 四个角都圆角，因为下面的内容没了
-            }
+    <div class="side-panel">
+      <div class="tabs">
+        <button class="tab active" data-tab="travel" onclick="switchTab('travel')">✈️ 出行</button>
+        <button class="tab" data-tab="visa" onclick="switchTab('visa')">🛂 签证</button>
+        <button class="tab" data-tab="city" onclick="switchTab('city')">🏙️ 城市</button>
+        <button class="tab" data-tab="shop" onclick="switchTab('shop')">🏚️ 历史商店</button>
+      </div>
+      <div class="tab-body">
+        <div id="tab-travel"></div>
+        <div id="tab-visa" class="hidden"></div>
+        <div id="tab-city" class="hidden"></div>
+        <div id="tab-shop" class="hidden"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 护照模态 ============ -->
+<div id="passport-modal" class="modal-bg hidden">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-head"><h2>📖 我的护照</h2><button class="close-btn" onclick="closePassport()">✕</button></div>
+    <div class="modal-body">
+      <div class="passport-wrap">
+        <div class="passport-cover">
+          <div class="ptitle">PASSPORT 护照</div>
+          <div class="grid4" id="passport-grid"></div>
+        </div>
+        <div class="passport-tip">
+          <b>贴纸技巧：</b>点击一张贴纸再点击另一格可交换位置。<br>
+          🧱 <b>柏林墙</b>：民主德国 ⇄ 联邦德国 贴纸<b>左右相邻</b><br>
+          🕊️ <b>三八线</b>：朝鲜 ⇄ 韩国 贴纸<b>上下相邻</b><br>
+          出生国护照贴纸固定在第 1 格。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 挑战墙模态 ============ -->
+<div id="challenge-modal" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>🏆 成就挑战墙</h2>
+      <span style="color:var(--dim)" id="ch-ov">0/32</span>
+      <button class="close-btn" onclick="closeChallenges()">✕</button>
+    </div>
+    <div class="modal-body" id="challenge-body"></div>
+  </div>
+</div>
+
+<!-- ============ 入境检查模态 ============ -->
+<div id="entry-modal" class="modal-bg hidden">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head"><h2>🛃 入境检查</h2><button class="close-btn" onclick="closeEntry()">✕</button></div>
+    <div class="modal-body" id="entry-body"></div>
+  </div>
+</div>
+
+<!-- ============ 胜利 ============ -->
+<div id="victory" class="hidden">
+  <div class="victory-badge">🎉</div>
+  <h1>环球通关！</h1>
+  <p>你完成了全部 32 项旅行成就，护照上的每一枚贴纸都在诉说着你的旅程。</p>
+  <button class="btn primary" style="padding:12px 40px;font-size:1.1em" onclick="closeVictory()">回顾我的旅程</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* =====================================================
+   数据定义
+===================================================== */
+const PASSPORTS = [
+  {id:'中国',   city:'北京',  color:'#c0392b', note:'可办台胞证/落地入台'},
+  {id:'台湾地区', city:'台北',  color:'#8e44ad', note:'台湾地区居民身份'},
+  {id:'美国',   city:'纽约',  color:'#1f618d', note:'免签多国'},
+  {id:'日本',   city:'东京',  color:'#e74c3c', note:'免签多国'},
+  {id:'俄罗斯', city:'莫斯科', color:'#7f8c8d', note:'陆路连欧亚'},
+  {id:'法国',   city:'巴黎',  color:'#34495e', note:'申根主力'},
+  {id:'德国',   city:'柏林',  color:'#2c3e50', note:'申根主力'},
+  {id:'英国',   city:'伦敦',  color:'#1a5276', note:'英联邦'},
+  {id:'希腊',   city:'雅典',  color:'#2980b9', note:'申根主力'},
+  {id:'意大利', city:'罗马',  color:'#27ae60', note:'申根主力'},
+  {id:'蒙古',   city:'乌兰巴托', color:'#16a085', note:'陆路连中俄'},
+];
+
+const CITIES = {
+  '北京':{c:'中国',x:860,y:285,cont:'亚洲',lm:'长城'},
+  '台北':{c:'台湾地区',x:928,y:302,cont:'亚洲',lm:'台北101'},
+  '首尔':{c:'韩国',x:958,y:258,cont:'亚洲',lm:'景福宫'},
+  '平壤':{c:'朝鲜',x:935,y:240,cont:'亚洲',lm:'万寿台'},
+  '东京':{c:'日本',x:1012,y:272,cont:'亚洲',lm:'东京塔'},
+  '长崎':{c:'日本',x:942,y:318,cont:'亚洲',lm:'原爆资料馆'},
+  '广岛':{c:'日本',x:966,y:312,cont:'亚洲',lm:'和平纪念公园'},
+  '乌兰巴托':{c:'蒙古',x:882,y:196,cont:'亚洲',lm:'苏赫巴托广场'},
+  '耶路撒冷':{c:'以色列',x:750,y:338,cont:'亚洲',lm:'圣殿山'},
+  '拉姆安拉':{c:'巴勒斯坦',x:738,y:348,cont:'亚洲',lm:'阿拉法特墓'},
+  '伊斯坦布尔':{c:'土耳其',x:722,y:332,cont:'欧洲',lm:'圣索菲亚'},
+  '莫斯科':{c:'俄罗斯',x:665,y:182,cont:'欧洲',lm:'红场'},
+  '加里宁格勒':{c:'俄罗斯',x:612,y:212,cont:'欧洲',lm:'柯尼斯堡大教堂'},
+  '沃尔库塔':{c:'俄罗斯',x:692,y:102,cont:'欧洲',lm:'沃尔库塔矿场'},
+  '基辅':{c:'乌克兰',x:628,y:192,cont:'欧洲',lm:'圣索菲亚大教堂'},
+  '柏林':{c:'德国',x:645,y:238,cont:'欧洲',lm:'勃兰登堡门'},
+  '巴黎':{c:'法国',x:558,y:258,cont:'欧洲',lm:'埃菲尔铁塔'},
+  '伦敦':{c:'英国',x:528,y:222,cont:'欧洲',lm:'大本钟'},
+  '贝尔法斯特':{c:'英国',x:502,y:205,cont:'欧洲',lm:'巨人之路'},
+  '罗马':{c:'意大利',x:625,y:338,cont:'欧洲',lm:'斗兽场'},
+  '马德里':{c:'西班牙',x:552,y:358,cont:'欧洲',lm:'普拉多博物馆'},
+  '雅典':{c:'希腊',x:695,y:332,cont:'欧洲',lm:'帕特农神庙'},
+  '突尼斯':{c:'突尼斯',x:588,y:398,cont:'非洲',lm:'迦太基遗址'},
+  '开普敦':{c:'南非',x:468,y:568,cont:'非洲',lm:'好望角'},
+  '纽约':{c:'美国',x:148,y:208,cont:'北美',lm:'自由女神像'},
+  '火奴鲁鲁':{c:'美国',x:468,y:332,cont:'北美',lm:'威基基海滩'},
+  '墨西哥城':{c:'墨西哥',x:212,y:338,cont:'北美',lm:'太阳金字塔'},
+  '哈瓦那':{c:'古巴',x:270,y:302,cont:'北美',lm:'国会大厦'},
+  '里约':{c:'巴西',x:330,y:488,cont:'南美',lm:'基督像'},
+  '布宜诺斯艾利斯':{c:'阿根廷',x:298,y:548,cont:'南美',lm:'科隆剧院'},
+  '圣地亚哥':{c:'智利',x:238,y:522,cont:'南美',lm:'武器广场'},
+  '利马':{c:'秘鲁',x:220,y:448,cont:'南美',lm:'马丘比丘'},
+  '悉尼':{c:'澳大利亚',x:1078,y:508,cont:'大洋洲',lm:'悉尼歌剧院'},
+};
+
+const LAND_LINKS=[['北京','平壤'],['平壤','首尔'],['北京','乌兰巴托'],['乌兰巴托','莫斯科'],['莫斯科','沃尔库塔'],['莫斯科','基辅'],['莫斯科','柏林'],['柏林','巴黎'],['巴黎','马德里'],['巴黎','伦敦'],['伊斯坦布尔','雅典'],['耶路撒冷','拉姆安拉'],['墨西哥城','纽约']];
+const SEA_LINKS=[['开普敦','贝尔法斯特'],['开普敦','悉尼'],['纽约','伦敦'],['东京','火奴鲁鲁'],['马德里','突尼斯'],['罗马','突尼斯'],['首尔','东京']];
+
+const COUNTRIES = {
+  '中国':{free:['俄罗斯'],arrival:[],cost:600,days:2,rate:.85,color:'#c0392b'},
+  '台湾地区':{free:[],arrival:['中国'],cost:300,days:1,rate:1,color:'#8e44ad'},
+  '韩国':{free:['美国','日本','法国','德国','英国','意大利','希腊'],arrival:[],cost:500,days:2,rate:.85,color:'#2980b9'},
+  '朝鲜':{free:[],arrival:[],cost:1500,days:5,rate:.5,color:'#8e44ad'},
+  '日本':{free:['美国','法国','德国','英国','意大利','希腊'],arrival:[],cost:1500,days:3,rate:.7,color:'#e74c3c'},
+  '蒙古':{free:['俄罗斯'],arrival:['中国','美国','日本','德国','法国','英国','意大利','希腊'],cost:400,days:1,rate:.9,color:'#16a085'},
+  '以色列':{free:['美国','日本','法国','德国','英国','意大利','希腊','俄罗斯'],arrival:[],cost:500,days:2,rate:.9,color:'#2980b9'},
+  '巴勒斯坦':{free:[],arrival:['中国','美国','俄罗斯','日本','法国','德国','英国','意大利','希腊','蒙古','台湾地区'],cost:200,days:1,rate:1,color:'#27ae60'},
+  '土耳其':{free:['德国','法国','英国','意大利','希腊','俄罗斯'],arrival:['中国','美国','日本'],cost:400,days:1,rate:.9,color:'#c0392b'},
+  '俄罗斯':{free:[],arrival:['蒙古'],cost:800,days:2,rate:.8,color:'#7f8c8d'},
+  '德国':{free:['美国','日本','法国','意大利','希腊'],arrival:[],cost:700,days:2,rate:.85,color:'#2c3e50'},
+  '法国':{free:['美国','日本','德国','意大利','希腊'],arrival:[],cost:700,days:2,rate:.85,color:'#34495e'},
+  '英国':{free:['美国','日本'],arrival:[],cost:900,days:3,rate:.8,color:'#1a5276'},
+  '意大利':{free:['美国','日本','法国','德国','希腊'],arrival:[],cost:700,days:2,rate:.85,color:'#27ae60'},
+  '西班牙':{free:['美国','日本','法国','德国','意大利','希腊'],arrival:[],cost:700,days:2,rate:.85,color:'#e67e22'},
+  '希腊':{free:['美国','日本','法国','德国','意大利'],arrival:[],cost:700,days:2,rate:.85,color:'#2980b9'},
+  '乌克兰':{free:[],arrival:['俄罗斯'],cost:400,days:1,rate:.9,color:'#d4ac0d'},
+  '突尼斯':{free:['中国','法国','德国','英国','意大利','希腊','日本'],arrival:['美国','俄罗斯'],cost:500,days:2,rate:.85,color:'#c0392b'},
+  '南非':{free:['美国','日本','法国','德国','英国','意大利','希腊','俄罗斯'],arrival:['中国'],cost:600,days:2,rate:.85,color:'#7d6608'},
+  '美国':{free:[],arrival:[],cost:2000,days:4,rate:.7,color:'#1f618d'},
+  '墨西哥':{free:['美国','日本','法国','德国','英国','意大利','希腊','俄罗斯'],arrival:['中国'],cost:600,days:2,rate:.85,color:'#1e8449'},
+  '古巴':{free:['美国','日本','法国','德国','英国','意大利','希腊','俄罗斯'],arrival:['中国'],cost:600,days:2,rate:.85,color:'#154360'},
+  '巴西':{free:['美国','日本','法国','德国','英国','意大利','希腊','俄罗斯'],arrival:['中国'],cost:600,days:2,rate:.85,color:'#1e8449'},
+  '阿根廷':{free:['美国','日本','法国','德国','英国','意大利','希腊','俄罗斯'],arrival:['中国'],cost:600,days:2,rate:.85,color:'#2e86c1'},
+  '智利':{free:['美国','日本','法国','德国','英国','意大利','希腊','俄罗斯'],arrival:['中国'],cost:600,days:2,rate:.85,color:'#c0392b'},
+  '秘鲁':{free:['美国','日本','法国','德国','英国','意大利','希腊','俄罗斯'],arrival:['中国'],cost:600,days:2,rate:.85,color:'#b03a2e'},
+  '澳大利亚':{free:['美国','日本','法国','德国','英国','意大利','希腊'],arrival:['中国'],cost:1200,days:3,rate:.75,color:'#1a5276'},
+};
+
+const HISTORIC = {
+  '苏联':{cost:8000,days:1,rate:.5,color:'#a93226',note:'已消亡国家 · 历史收藏'},
+  '民主德国':{cost:5000,days:1,rate:.6,color:'#7d3c98',note:'东德(1949-1990) · 历史收藏'},
+  '联邦德国':{cost:5000,days:1,rate:.6,color:'#b7950b',note:'西德(1949-1990) · 历史收藏'},
+  '中华民国':{cost:6000,days:1,rate:.55,color:'#1a5276',note:'1912-1949 历史时期收藏品'},
+  '法兰西第四共和国':{cost:6000,days:1,rate:.55,color:'#1f618d',note:'1946-1958 · 已消亡国家'},
+};
+
+const ACHIEVEMENTS = [
+  {id:1,series:'traveler',icon:'🌐',title:'五老星',desc:'拥有联合国五常（中/美/俄/法/英）签证',check:g=>['中国','美国','俄罗斯','法国','英国'].every(c=>hasVisa(g,c))},
+  {id:2,series:'traveler',icon:'✈️',title:'环球旅行家',desc:'到访过全部六个大洲',check:g=>['亚洲','欧洲','非洲','北美','南美','大洋洲'].every(x=>g.visitedCont.has(x))},
+  {id:3,series:'traveler',icon:'🛂',title:'外交专家',desc:'获得所有免签/落地签国家的入境许可（全部到访）',check:g=>{const list=Object.keys(COUNTRIES).filter(c=>COUNTRIES[c].free.includes(g.passport)||COUNTRIES[c].arrival.includes(g.passport));return list.length>0&&list.every(c=>g.visitedCountries.has(c));}},
+  {id:4,series:'cold-war',icon:'🧱',title:'柏林墙',desc:'拥有民主德国与联邦德国贴纸签证，且左右相邻',check:g=>adjacent(g,'民主德国','联邦德国','row')},
+  {id:5,series:'cold-war',icon:'🗺️',title:'飞地悖论',desc:'拥有俄罗斯签证，且在加里宁格勒入境',check:g=>hasVisa(g,'俄罗斯')&&g.entryHistory.some(e=>e.city==='加里宁格勒')},
+  {id:6,series:'cold-war',icon:'🌊',title:'海峡两岸',desc:'同时拥有中国大陆签证和台湾地区签证',check:g=>hasVisa(g,'中国')&&hasVisa(g,'台湾地区')},
+  {id:7,series:'cold-war',icon:'👻',title:'红色幽灵',desc:'同时拥有苏联签证和俄罗斯签证',check:g=>hasVisa(g,'苏联')&&hasVisa(g,'俄罗斯')},
+  {id:8,series:'cold-war',icon:'🕊️',title:'三八线',desc:'拥有朝鲜和韩国贴纸签证，且上下相邻',check:g=>adjacent(g,'朝鲜','韩国','col')},
+  {id:9,series:'cold-war',icon:'🪪',title:'上次来也没要护照啊',desc:'持有中国护照，陆路经朝鲜入境韩国，并抵达首尔',check:g=>g.passport==='中国'&&orderIn(g,'平壤','首尔',m=>m.mode==='陆路')},
+  {id:10,series:'cold-war',icon:'🛰️',title:'石子击卫星',desc:'同时拥有朝鲜和美国签证',check:g=>hasVisa(g,'朝鲜')&&hasVisa(g,'美国')},
+  {id:11,series:'cold-war',icon:'❓',title:'未解之谜',desc:'拥有巴勒斯坦和以色列的入境许可',check:g=>hasVisa(g,'巴勒斯坦')&&hasVisa(g,'以色列')},
+  {id:12,series:'cold-war',icon:'🪙',title:'五帝钱',desc:'拥有苏联、中华民国、法兰西第四共和国、美国、英国签证',check:g=>hasVisa(g,'苏联')&&hasVisa(g,'中华民国')&&hasVisa(g,'法兰西第四共和国')&&hasVisa(g,'美国')&&hasVisa(g,'英国')},
+  {id:13,series:'global-conflict',icon:'❄️',title:'冬将军',desc:'持法国或德国护照入境俄罗斯，并在冬季结束前离境',check:g=>(g.passport==='法国'||g.passport==='德国')&&g.russia.enteredWinter&&g.russia.leftBeforeSpring},
+  {id:14,series:'global-conflict',icon:'☢️',title:'二次原',desc:'持有美国签证，从长崎入境，随后前往广岛',check:g=>hasVisa(g,'美国')&&g.entryHistory.some(e=>e.city==='长崎')&&orderIn(g,'长崎','广岛')},
+  {id:15,series:'global-conflict',icon:'🗡️',title:'虎！虎！虎！',desc:'持有日本签证，入境夏威夷',check:g=>hasVisa(g,'日本')&&g.entryHistory.some(e=>e.city==='火奴鲁鲁')},
+  {id:16,series:'global-conflict',icon:'📄',title:'克里米亚危机',desc:'申请乌克兰签证时，提交了俄罗斯的邀请函',check:g=>g.flag.crimea&&hasVisa(g,'乌克兰')},
+  {id:17,series:'global-conflict',icon:'💥',title:'特别军事行动',desc:'申请俄罗斯签证时，提交了乌克兰的邀请函',check:g=>g.flag.military&&hasVisa(g,'俄罗斯')},
+  {id:18,series:'unusual-path',icon:'🌮',title:'Taco Amigo',desc:'从美国入境墨西哥',check:g=>g.entryHistory.some(e=>e.city==='墨西哥城'&&e.prevCountry==='美国')},
+  {id:19,series:'unusual-path',icon:'👑',title:'两大强国伺候我一个人',desc:'作为台湾地区居民，拥有台胞证和美国签证',check:g=>g.passport==='台湾地区'&&hasVisa(g,'美国')},
+  {id:20,series:'unusual-path',icon:'💼',title:'临时工',desc:'以临时工作签证入境，担任外交官',check:g=>g.flag.diplomat},
+  {id:21,series:'unusual-path',icon:'🐟',title:'漏网之鱼',desc:'没有美国签证，从墨西哥偷渡入境美国',check:g=>g.entryHistory.some(e=>e.city==='纽约'&&e.mode==='illegal')},
+  {id:22,series:'unusual-path',icon:'🙏',title:'妈祖同意了',desc:'福建/广东/海南户籍，无签证偷渡入境成功',check:g=>['福建','广东','海南'].includes(g.hukou)&&g.entryHistory.some(e=>e.mode==='illegal')},
+  {id:23,series:'unusual-path',icon:'🈳',title:'无国界',desc:'护照盖满所有国家的机场章，但从未入境任何国家',check:g=>g.transitStamps.size===totalCountries()&&g.entryHistory.length===0},
+  {id:24,series:'fantasy-time',icon:'🚩',title:'红色警戒',desc:'持有苏联签证，从纽约入境美国，并游览自由女神像',check:g=>hasVisa(g,'苏联')&&g.entryHistory.some(e=>e.city==='纽约')&&g.landmarks.has('自由女神像')},
+  {id:25,series:'fantasy-time',icon:'🎮',title:'红色警戒3',desc:'持有日本签证，入境苏联/俄罗斯，并游览沃尔库塔',check:g=>hasVisa(g,'日本')&&g.entryHistory.some(e=>e.country==='俄罗斯')&&g.landmarks.has('沃尔库塔矿场')},
+  {id:26,series:'fantasy-time',icon:'⛵',title:'西洋',desc:'持有中国护照，沿海路经好望角到达贝尔法斯特',check:g=>g.passport==='中国'&&g.travelLog.some(m=>m.to==='开普敦'&&m.mode==='海路')&&g.visitedCities.has('贝尔法斯特')},
+  {id:27,series:'byzantine-tears',icon:'⚡',title:'他将如闪电般归来',desc:'持有希腊签证，从伊斯坦布尔入境土耳其',check:g=>hasVisa(g,'希腊')&&g.entryHistory.some(e=>e.city==='伊斯坦布尔')},
+  {id:28,series:'byzantine-tears',icon:'🏛️',title:'我来，我见，我征服',desc:'持有意大利签证，入境土耳其',check:g=>hasVisa(g,'意大利')&&g.entryHistory.some(e=>e.country==='土耳其')},
+  {id:29,series:'byzantine-tears',icon:'🧂',title:'迦太基必须灭亡',desc:'持有意大利签证入境突尼斯，并在地上撒盐',check:g=>hasVisa(g,'意大利')&&g.visitedCities.has('突尼斯')&&g.flag.salt},
+  {id:30,series:'exploration-era',icon:'🐎',title:'金帐汗国',desc:'持有蒙古签证，沿陆路到达莫斯科',check:g=>hasVisa(g,'蒙古')&&g.travelLog.some(m=>m.to==='莫斯科'&&m.mode==='陆路')},
+  {id:31,series:'exploration-era',icon:'🔄',title:'逆向殖民',desc:'持有拉美/非洲/英联邦国家签证，入境西班牙/法国/英国',check:g=>{const la=['墨西哥','古巴','巴西','阿根廷','智利','秘鲁'].some(c=>hasVisa(g,c));const af=['突尼斯','南非'].some(c=>hasVisa(g,c));const cw=['英国','澳大利亚'].some(c=>hasVisa(g,c));return (la||af||cw)&&g.entryHistory.some(e=>['西班牙','法国','英国'].includes(e.country));}},
+  {id:32,series:'exploration-era',icon:'🏆',title:'四大总督区',desc:'游览拉丁美洲的所有国家（墨/古/巴/阿/智/秘）',check:g=>['墨西哥','古巴','巴西','阿根廷','智利','秘鲁'].every(c=>g.visitedCountries.has(c))},
+];
+const SERIES = [
+  {id:'traveler',name:'旅行家'},
+  {id:'cold-war',name:'冷战风云'},
+  {id:'global-conflict',name:'全球冲突'},
+  {id:'unusual-path',name:'不走寻常路'},
+  {id:'fantasy-time',name:'幻想时刻'},
+  {id:'byzantine-tears',name:'精罗落泪'},
+  {id:'exploration-era',name:'探索时代'},
+];
+
+/* =====================================================
+   工具函数
+===================================================== */
+function dist(a,b){const A=CITIES[a],B=CITIES[b];return Math.round(Math.sqrt((A.x-B.x)**2+(A.y-B.y)**2));}
+function flightCost(a,b){return Math.max(800,Math.round(dist(a,b)*8));}
+function totalCountries(){return new Set(Object.keys(CITIES).map(k=>CITIES[k].c)).size;}
+function hasVisa(g,c){return g.stickers.some(s=>s.key===c)||g.passport===c;}
+function monthOf(g){return g.date.getMonth()+1;}
+function seasonOf(g){const m=monthOf(g);return (m===12||m<=2)?'冬':(m<=5)?'春':(m<=8)?'夏':'秋';}
+function fmtMoney(n){return '¥'+Math.round(n).toLocaleString('zh-CN');}
+function countryOfCity(city){return CITIES[city].c;}
+function orderIn(g,a,b,filter){const idxA=g.travelLog.findIndex(m=>m.to===a&&(!filter||filter(m)));const idxB=g.travelLog.findIndex(m=>m.to===b);return idxA>=0&&idxB>idxA;}
+function adjacent(g,keyA,keyB,axis){
+  const pa=g.stickers.find(s=>s.key===keyA),pb=g.stickers.find(s=>s.key===keyB);
+  if(!pa||!pb)return false;
+  const cols=4;
+  const ra=Math.floor(pa.pos/cols),ca=pa.pos%cols,rb=Math.floor(pb.pos/cols),cb=pb.pos%cols;
+  if(axis==='row')return ra===rb&&Math.abs(ca-cb)===1;
+  return ca===cb&&Math.abs(ra-rb)===1;
+}
+function toast(msg,cls){const el=document.createElement('div');el.className='toast-item '+(cls||'');el.textContent=msg;document.getElementById('toast').appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .4s';setTimeout(()=>el.remove(),400);},2600);}
+
+/* =====================================================
+   游戏状态
+===================================================== */
+let G=null;
+
+function newGame(passportId,hukou){
+  const p=PASSPORTS.find(x=>x.id===passportId);
+  const startCity=p.city;
+  G={
+    passport:p.id, hukou:hukou||'普通', startCity, city:startCity, transitAt:null,
+    money:30000, date:new Date(2026,0,1), day:1,
+    stickers:[{key:p.id,kind:'passport',pos:0}],
+    nextPos:1,
+    entryHistory:[], travelLog:[], landmarks:new Set(),
+    visitedCities:new Set([startCity]), visitedCountries:new Set([CITIES[startCity].c]),
+    visitedCont:new Set([CITIES[startCity].cont]),
+    transitStamps:new Set(), unlocked:new Set(),
+    russia:{enteredWinter:false,leftBeforeSpring:false},
+    flag:{crimea:false,military:false,diplomat:false,salt:false},
+  };
+  checkAchievements();
+  saveGame();
+}
+
+/* =====================================================
+   移动 / 入境
+===================================================== */
+function currentVisaPolicy(g,country){
+  const pol=COUNTRIES[country];
+  if(pol.free.includes(g.passport))return 'free';
+  if(pol.arrival.includes(g.passport))return 'arrival';
+  return 'required';
+}
+
+function doTravel(destCity,mode,purpose){
+  const g=G,from=g.city;
+  if(destCity===from)return;
+  const cost = mode==='转机'?Math.round(flightCost(from,destCity)*0.6):(mode==='飞机'?flightCost(from,destCity):(mode==='陆路'?600:900));
+  const days = (mode==='飞机'||mode==='转机')?1:(mode==='陆路'?2:3);
+  if(g.money<cost){toast('资金不足，无法出行', 'err');return;}
+  g.money-=cost; advance(days);
+  g.travelLog.push({from,to:destCity,mode,date:new Date(g.date),purpose});
+  if(mode==='转机'){
+    const c=countryOfCity(destCity);
+    g.transitStamps.add(c);
+    g.transitAt=destCity;
+    toast('✈️ 转机抵达 '+destCity+' 机场（未入境，获得机场章）');
+    renderAll(); saveGame(); checkAchievements();
+    return;
+  }
+  // 到达目的地，进入入境检查
+  g._pendingEntry={destCity,mode,purpose};
+  openEntryModal(destCity);
+}
+
+function entryPolicyText(g,country){
+  const pol=currentVisaPolicy(g,country);
+  if(pol==='free')return {label:'免签入境',cls:'free',fee:0,desc:'对该护照免签，直接放行'};
+  if(pol==='arrival')return {label:'落地签',cls:'arrival',fee:COUNTRIES[country].cost,desc:'可办理落地签 '+fmtMoney(COUNTRIES[country].cost)};
+  return {label:'需签证',cls:'need',fee:0,desc:hasVisa(g,country)?'已持有该国签证，可以入境':'未持有该国签证，不可正常入境'};
+}
+
+function performEntry(action){
+  const g=G,p=g._pendingEntry; if(!p)return;
+  const country=countryOfCity(p.destCity);
+  const pol=currentVisaPolicy(g,country);
+  const c=COUNTRIES[country];
+  delete g._pendingEntry;
+
+  if(action==='cancel'){renderAll();return;}
+
+  if(action==='illegal'){
+    // 硬闯
+    if(Math.random()<0.4){
+      doEnter(g,p.destCity,'illegal',p.purpose);
+      toast('🕳️ 硬闯入境成功！');
+    }else{
+      g.money=Math.max(0,g.money-5000);
+      g.city=g.startCity;
+      toast('🚔 被边境警察逮捕！罚款 ¥5,000 并被遣返回 '+g.startCity,'err');
+    }
+    renderAll();saveGame();checkAchievements();return;
+  }
+
+  if(action==='legal'){
+    // 台湾地区居民持台胞证入境中国大陆（免签政策之外的特殊安排）
+    if(country==='中国'&&g.passport==='台湾地区'&&!hasVisa(g,'中国')){addSticker(g,'中国','visa');toast('🪪 签发台胞证（视为中国签证贴纸）');}
+    if(pol==='arrival'){
+      if(g.money<c.cost){toast('资金不足办理落地签','err');return;}
+      g.money-=c.cost;
+      addSticker(g,country,'visa');
+    }
+    if(pol==='required'&&!hasVisa(g,country)){toast('没有签证，无法正常入境','err');return;}
+    if(pol==='free'&&country==='中国'&&g.passport==='台湾地区'&&!hasVisa(g,'中国')){addSticker(g,'中国','visa');toast('🪪 签发台胞证（视为中国签证贴纸）');}
+    doEnter(g,p.destCity,'legal',p.purpose);
+    renderAll();saveGame();checkAchievements();
+  }
+}
+
+function doEnter(g,city,mode,purpose){
+  const country=countryOfCity(city);
+  const entry={city,country,date:new Date(g.date),mode,purpose,prevCity:g.city,prevCountry:countryOfCity(g.city)};
+  g.entryHistory.push(entry);
+  g.transitAt=null;
+  g.city=city;
+  g.visitedCities.add(city);
+  g.visitedCountries.add(country);
+  g.visitedCont.add(CITIES[city].cont);
+  // 俄罗斯冬将军记录
+  if(country==='俄罗斯'&&[12,1,2].includes(monthOf(g)))g.russia.enteredWinter=true;
+  if(purpose==='外交')g.flag.diplomat=true;
+  toast('🛬 入境 '+country+' · '+city+(mode==='illegal'?'（偷渡）':''));
+  checkAchievements();
+}
+
+/* 离境检测：在 travelLog 中，从俄罗斯城市离开且发生在冬季 */
+function updateRussiaLeave(g){
+  for(const m of g.travelLog){
+    if(countryOfCity(m.from)==='俄罗斯'&&[12,1,2].includes(m.date.getMonth()+1))g.russia.leftBeforeSpring=true;
+  }
+}
+
+/* =====================================================
+   签证
+===================================================== */
+function addSticker(g,key,kind){
+  if(g.stickers.some(s=>s.key===key))return;
+  g.stickers.push({key,kind,pos:g.nextPos++});
+  if(g.nextPos>=12){ // 护照页满，翻页（重新整理到第二页：简单扩容位置）
+  }
+}
+function policyOfPassportFor(g,country){
+  const pol=currentVisaPolicy(g,country);
+  if(hasVisa(g,country))return 'owned';
+  return pol;
+}
+
+function applyVisa(country){
+  const g=G;
+  if(hasVisa(g,country))return;
+  // 台湾地区居民申请"中国签证"= 签发台胞证
+  if(country==='中国'&&g.passport==='台湾地区'){addSticker(g,'中国','visa');toast('🪪 签发台胞证');renderAll();saveGame();checkAchievements();return;}
+  const c=COUNTRIES[country];
+  const pol=currentVisaPolicy(g,country);
+  if(pol==='free'){addSticker(g,country,'visa');toast('🛂 免签国，直接获得入境贴纸');renderAll();saveGame();checkAchievements();return;}
+  if(g.money<c.cost){toast('资金不足','err');return;}
+  // 克里米亚/特别军事行动 邀请函
+  if(country==='乌克兰'&&hasVisa(g,'俄罗斯')&&!g.flag.crimea){g.flag.crimea=true;toast('📄 提交了俄罗斯的邀请函（克里米亚危机条件已满足）','ach');}
+  if(country==='俄罗斯'&&hasVisa(g,'乌克兰')&&!g.flag.military){g.flag.military=true;toast('💥 提交了乌克兰的邀请函（特别军事行动条件已满足）','ach');}
+  g.money-=c.cost;
+  toast('🛂 已提交 '+country+' 签证申请，审批约 '+c.days+' 天，成功率 '+(c.rate*100).toFixed(0)+'%');
+  advance(c.days);
+  if(Math.random()<c.rate){
+    addSticker(g,country,'visa');
+    toast('✅ '+country+' 签证获批！');
+  }else{
+    toast('❌ '+country+' 签证被拒，可重新申请','err');
+  }
+  renderAll();saveGame();checkAchievements();
+}
+
+function buyHistoric(key){
+  const g=G;
+  if(hasVisa(g,key)){toast('已拥有该贴纸');return;}
+  const h=HISTORIC[key];
+  if(g.money<h.cost){toast('资金不足','err');return;}
+  g.money-=h.cost; advance(h.days);
+  if(Math.random()<h.rate){
+    addSticker(g,key,'historic');
+    toast('🏚️ 获得历史签证贴纸：'+key+'！','ach');
+  }else{
+    toast('❌ 收藏家拒绝了这次交易（'+key+' 获取失败）','err');
+  }
+  renderAll();saveGame();checkAchievements();
+}
+
+/* =====================================================
+   时间 / 经济
+===================================================== */
+function advance(days){
+  G.date.setDate(G.date.getDate()+days);
+  G.day+=days;
+  updateRussiaLeave(G);
+}
+function workDay(){
+  if(G.money<0){}
+  G.money+=2500; advance(1);
+  toast('💼 打零工 1 天，收入 ¥2,500');
+  renderAll();saveGame();
+}
+function visitLandmark(){
+  const g=G,city=g.city;
+  const lm=CITIES[city].lm;
+  if(g.landmarks.has(lm)){toast('已经游览过这里了');return;}
+  g.landmarks.add(lm); advance(1);
+  toast('📸 游览 '+lm);
+  renderAll();saveGame();checkAchievements();
+}
+function doSalt(){
+  const g=G;
+  if(g.city!=='突尼斯')return;
+  if(g.flag.salt){toast('已经撒过盐了');return;}
+  g.flag.salt=true;
+  toast('🧂 在迦太基遗址的土地上撒了一把盐……');
+  renderAll();saveGame();checkAchievements();
+}
+
+/* =====================================================
+   挑战检测
+===================================================== */
+function checkAchievements(){
+  if(!G)return;
+  let newCount=0;
+  for(const a of ACHIEVEMENTS){
+    if(!G.unlocked.has(a.id)){
+      try{
+        if(a.check(G)){
+          G.unlocked.add(a.id);
+          G.money+=2000;
+          newCount++;
+          toast('🏆 成就解锁：【'+a.title+'】 +¥2,000','ach');
         }
-    </script>
+      }catch(e){console.error('ach check error',a.id,e);}
+    }
+  }
+  if(newCount>0){renderAll();saveGame();}
+  if(G.unlocked.size>=ACHIEVEMENTS.length){showVictory();}
+}
+
+/* =====================================================
+   渲染
+===================================================== */
+function renderAll(){
+  if(!G)return;
+  document.getElementById('s-money').textContent=fmtMoney(G.money);
+  document.getElementById('s-date').textContent=G.date.getFullYear()+'年'+(G.date.getMonth()+1)+'月'+G.date.getDate()+'日 · '+seasonOf(G);
+  document.getElementById('s-city').textContent=G.city+(G.transitAt?'（机场过境）':'');
+  document.getElementById('s-progress').textContent=G.unlocked.size+'/32';
+  document.getElementById('s-progress2').textContent=G.unlocked.size;
+  renderMap();
+  renderTravelTab();
+  renderVisaTab();
+  renderCityTab();
+  renderShopTab();
+  renderPassport();
+  renderChallenges();
+}
+
+function renderMap(){
+  const svg=document.getElementById('world-map');
+  let s='<defs><radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#4fc3f7" stop-opacity=".5"/><stop offset="100%" stop-color="#4fc3f7" stop-opacity="0"/></radialGradient></defs>';
+  s+='<rect x="0" y="0" width="1160" height="620" fill="#141824"/>';
+  // 陆路
+  for(const [a,b] of LAND_LINKS){
+    s+=`<line x1="${CITIES[a].x}" y1="${CITIES[a].y}" x2="${CITIES[b].x}" y2="${CITIES[b].y}" stroke="#8a6d3b" stroke-width="2" stroke-dasharray="6 4" opacity=".7"/>`;
+  }
+  // 海路
+  for(const [a,b] of SEA_LINKS){
+    s+=`<line x1="${CITIES[a].x}" y1="${CITIES[a].y}" x2="${CITIES[b].x}" y2="${CITIES[b].y}" stroke="#2e6da4" stroke-width="2" stroke-dasharray="2 6" opacity=".8"/>`;
+  }
+  // 节点
+  for(const name of Object.keys(CITIES)){
+    const c=CITIES[name];
+    const isCur=G.city===name;
+    const isVisited=G.visitedCities.has(name);
+    const isTransit=G.transitAt===name;
+    const fill=isCur?'#fdd835':(isVisited?'#66bb6a':'#3a4052');
+    const r=isCur?10:8;
+    if(isCur)s+=`<circle cx="${c.x}" cy="${c.y}" r="26" fill="url(#glow)"/>`;
+    s+=`<circle cx="${c.x}" cy="${c.y}" r="${r}" fill="${fill}" stroke="${isCur?'#fff':'#141824'}" stroke-width="2" cursor="pointer" onclick="selectDest('${name}')"/>`;
+    if(isTransit)s+=`<text x="${c.x}" y="${c.y-14}" font-size="12" text-anchor="middle">✈️</text>`;
+    s+=`<text x="${c.x}" y="${c.y+r+14}" font-size="${isCur?12:10.5}" text-anchor="middle" fill="${isCur?'#fdd835':(isVisited?'#9ad19a':'#6b7280')}" font-weight="${isCur?'bold':'normal'}" cursor="pointer" onclick="selectDest('${name}')">${name}</text>`;
+  }
+  // 图例
+  s+='<g font-size="10" fill="#6b7280">';
+  s+='<line x1="20" y1="588" x2="44" y2="588" stroke="#8a6d3b" stroke-dasharray="6 4"/><text x="50" y="591">陆路</text>';
+  s+='<line x1="110" y1="588" x2="134" y2="588" stroke="#2e6da4" stroke-dasharray="2 6"/><text x="140" y="591">海路</text>';
+  s+='<circle cx="200" cy="588" r="7" fill="#66bb6a"/><text x="212" y="591">已到访</text>';
+  s+='<circle cx="270" cy="588" r="7" fill="#fdd835"/><text x="282" y="591">当前位置</text>';
+  s+='</g>';
+  svg.innerHTML=s;
+}
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  ['travel','visa','city','shop'].forEach(id=>document.getElementById('tab-'+id).classList.toggle('hidden',id!==t));
+}
+
+let selDest=null, selMode='飞机', selPurpose='旅游';
+function selectDest(name){
+  selDest=name;
+  switchTab('travel');
+  renderTravelTab();
+}
+function setMode(m){selMode=m;renderTravelTab();}
+function setPurpose(p){selPurpose=p;renderTravelTab();}
+
+function renderTravelTab(){
+  const g=G,el=document.getElementById('tab-travel');
+  const inTransit=!!g.transitAt;
+  let s='';
+  s+=`<div class="city-info"><div class="nm">${g.transitAt?('✈️ 机场过境 · '+g.transitAt):('📍 '+g.city)}</div><div class="meta">国家：${countryOfCity(g.transitAt||g.city)} · ${seasonOf(g)}季 · 已有 ¥${fmtMoney(g.money)}</div></div>`;
+  if(inTransit){
+    s+=`<button class="btn primary" style="width:100%;margin-bottom:10px" onclick="enterFromTransit()">🛃 办理入境（离开机场）</button>`;
+    s+='<div class="small-note" style="margin-bottom:10px">转机只获得机场章。办理入境后按正常签证政策检查。</div>';
+  }
+  s+=`<h3>选择目的地</h3><ul class="dest-list">`;
+  const from=g.transitAt||g.city;
+  for(const name of Object.keys(CITIES)){
+    if(name===from)continue;
+    const c=CITIES[name];
+    const canLand=LAND_LINKS.some(l=>(l[0]===from&&l[1]===name)||(l[0]===name&&l[1]===from));
+    const canSea=SEA_LINKS.some(l=>(l[0]===from&&l[1]===name)||(l[0]===name&&l[1]===from));
+    const pol=currentVisaPolicy(g,c.c);
+    const polTxt=pol==='free'?'免签':pol==='arrival'?'落地签':(hasVisa(g,c.c)?'有签证':'需签证');
+    const d=dist(from,name);
+    s+=`<li class="${selDest===name?'sel':''}" onclick="selectDest('${name}')"><div><div class="dn">${name} <span style="color:var(--faint);font-size:.78em">${c.c} · ${c.cont}</span></div><div class="dm" style="text-align:left">${polTxt} · 飞¥${flightCost(from,name).toLocaleString()}${canLand?' · 陆¥600':''}${canSea?' · 海¥900':''}</div></div><div style="font-size:1.3em">${isVisitedDot(name)}</div></li>`;
+  }
+  s+='</ul>';
+  if(!inTransit){
+    s+='<div class="mode-row">';
+    s+=`<button class="mode-btn ${selMode==='飞机'?'sel':''}" onclick="setMode('飞机')">✈️ 飞机(1天)</button>`;
+    s+=`<button class="mode-btn ${selMode==='陆路'?'sel':''}" ${canLandAny(from)?'':'disabled'} onclick="setMode('陆路')">🚂 陆路(2天)</button>`;
+    s+=`<button class="mode-btn ${selMode==='海路'?'sel':''}" ${canSeaAny(from)?'':'disabled'} onclick="setMode('海路')">⛴️ 海路(3天)</button>`;
+    s+=`<button class="mode-btn ${selMode==='转机'?'sel':''}" onclick="setMode('转机')">✈️ 转机过境</button>`;
+    s+='</div>';
+    s+='<div class="purpose-row">';
+    for(const p of ['旅游','商务','外交']){
+      s+=`<button class="purpose-btn ${selPurpose===p?'sel':''}" onclick="setPurpose('${p}')">${p==='旅游'?'🎒':p==='商务'?'📊':'💼'} ${p}</button>`;
+    }
+    s+='</div>';
+  }
+  if(selDest&&selDest!==from){
+    const dd=dist(from,selDest);
+    const canLand=LAND_LINKS.some(l=>(l[0]===from&&l[1]===selDest)||(l[0]===selDest&&l[1]===from));
+    const canSea=SEA_LINKS.some(l=>(l[0]===from&&l[1]===selDest)||(l[0]===selDest&&l[1]===from));
+    let mode=selMode;
+    if(inTransit)mode='转机';
+    else if(mode==='陆路'&&!canLand)mode='飞机';
+    else if(mode==='海路'&&!canSea)mode='飞机';
+    const cost=mode==='飞机'?flightCost(from,selDest):(mode==='陆路'?600:900);
+    s+=`<button class="btn primary" style="width:100%;margin-top:10px;font-size:1.05em" onclick="doTravel('${selDest}','${mode}','${selPurpose}')">出发：${from} → ${selDest}（${mode}，${fmtMoney(cost)}，${mode==='飞机'?1:mode==='陆路'?2:3}天）</button>`;
+    if(mode==='转机')s+='<div class="small-note">转机获得目的地国家机场章，不入境。</div>';
+    if(mode!=='转机')s+=`<div class="small-note">入境目的：${selPurpose}</div>`;
+  }
+  el.innerHTML=s;
+}
+function canLandAny(from){return LAND_LINKS.some(l=>l[0]===from||l[1]===from);}
+function canSeaAny(from){return SEA_LINKS.some(l=>l[0]===from||l[1]===from);}
+function isVisitedDot(name){return G.visitedCities.has(name)?'✅':'';}
+
+function enterFromTransit(){
+  const g=G; if(!g.transitAt)return;
+  g._pendingEntry={destCity:g.transitAt,mode:'飞机',purpose:'旅游'};
+  openEntryModal(g.transitAt);
+}
+
+function renderVisaTab(){
+  const g=G,el=document.getElementById('tab-visa');
+  let s='<h3>🛂 签证中心（可申请任意国家签证）</h3>';
+  s+='<div class="visa-list">';
+  for(const c of Object.keys(COUNTRIES)){
+    const pol=COUNTRIES[c];
+    const st=policyOfPassportFor(g,c);
+    const owned=hasVisa(g,c);
+    let tag='';
+    if(owned)tag='<span class="tag owned">已持有</span>';
+    else if(st==='free')tag='<span class="tag free">免签</span>';
+    else if(st==='arrival')tag='<span class="tag arrival">落地签</span>';
+    else tag='<span class="tag need">需申请</span>';
+    const btn=owned?'':(st==='free'?`<button class="btn small primary" onclick="applyVisa('${c}')">获取</button>`:`<button class="btn small" onclick="applyVisa('${c}')">申请 ¥${pol.cost.toLocaleString()}</button>`);
+    s+=`<div class="visa-item ${owned?'owned':''}"><div class="vn"><span class="visa-dot" style="background:${pol.color}"></span>${c} ${tag}</div><div style="text-align:right"><div class="vt">${owned?'':(st==='free'?'免签直达':(st==='arrival'?'落地可办':(pol.days+'天 · 成功率'+(pol.rate*100).toFixed(0)+'%')))}</div>${btn}</div></div>`;
+  }
+  s+='</div>';
+  s+='<div class="small-note">免签国可直接获取贴纸；落地签在入境时办理更划算。</div>';
+  el.innerHTML=s;
+}
+
+function renderCityTab(){
+  const g=G,el=document.getElementById('tab-city');
+  const city=g.transitAt||g.city;
+  const c=CITIES[city];
+  const lm=c.lm;
+  const lmDone=g.landmarks.has(lm);
+  let s='';
+  s+=`<div class="city-info"><div class="nm">${g.transitAt?'✈️ 机场过境':city}</div><div class="meta">国家：${c.c} · ${c.cont} · 入境 ${g.entryHistory.filter(e=>e.city===city).length} 次</div></div>`;
+  if(g.transitAt){
+    s+=`<button class="btn primary" style="width:100%" onclick="enterFromTransit()">🛃 办理入境</button>`;
+    s+='<div class="small-note">机场过境中：未入境，仅持机场章。办理入境需通过签证检查。</div>';
+    el.innerHTML=s;return;
+  }
+  s+='<div class="landmark-box"><div style="font-size:1.1em">📸 当地景点</div><div class="lm" style="font-size:1.25em;margin:4px 0">'+(lm||'（无特别景点）')+'</div>';
+  if(lm&&!lmDone)s+=`<button class="btn" onclick="visitLandmark()">游览（1天）</button>`;
+  else if(lm)s+='<span class="tag owned">已游览 ✅</span>';
+  s+='</div>';
+  if(city==='突尼斯'&&!g.flag.salt){
+    s+='<div class="landmark-box"><div style="font-size:1.1em">🧂 特殊行动</div><p style="color:var(--dim);font-size:.85em;margin:4px 0">传说罗马元老要求"迦太基必须灭亡"——在遗址上撒盐以诅咒这片土地。</p><button class="btn gold" onclick="doSalt()">在地上撒一把盐</button></div>';
+  }
+  s+='<div class="landmark-box"><div style="font-size:1.1em">💼 打零工</div><p style="color:var(--dim);font-size:.85em;margin:4px 0">赚取旅费：工作 1 天，收入 ¥2,500</p><button class="btn" onclick="workDay()">打零工 1 天</button></div>';
+  s+=`<div class="landmark-box"><div style="font-size:1.1em">📜 我的旅程记录</div><div style="color:var(--dim);font-size:.82em;margin-top:6px;line-height:1.7">${g.travelLog.length===0?'还没有出行记录':g.travelLog.slice(-10).reverse().map(m=>`${m.from} → ${m.to}（${m.mode} · ${m.date.getMonth()+1}月${m.date.getDate()}日）`).join('<br>')}</div></div>`;
+  s+=`<div class="landmark-box"><div style="font-size:1.1em">🗺️ 到访</div><div style="color:var(--dim);font-size:.82em;margin-top:6px;line-height:1.7">城市 ${g.visitedCities.size}/${Object.keys(CITIES).length} · 国家 ${g.visitedCountries.size}/${totalCountries()} · 大洲 ${g.visitedCont.size}/6 · 景点 ${g.landmarks.size}</div></div>`;
+  el.innerHTML=s;
+}
+
+function renderShopTab(){
+  const g=G,el=document.getElementById('tab-shop');
+  let s='<h3>🏚️ 历史签证收藏店</h3><div class="small-note" style="margin-bottom:10px">这些国家的签证早已不再签发，只能从收藏家手中购得。成功率不高，请备足资金。</div>';
+  for(const key of Object.keys(HISTORIC)){
+    const h=HISTORIC[key];
+    const owned=hasVisa(g,key);
+    s+=`<div class="shop-item"><h4><span class="visa-dot" style="background:${h.color};width:26px;height:18px;border-radius:3px;display:inline-block;vertical-align:middle;margin-right:6px;border:1px solid rgba(255,255,255,.25)"></span>${key}</h4><p>${h.note}</p><div><span class="cost">${fmtMoney(h.cost)}</span> · ${h.days}天 · 成功率${(h.rate*100).toFixed(0)}%  ${owned?'<span class="tag owned">已收藏</span>':''}</div>${owned?'':`<button class="btn gold" style="margin-top:6px" onclick="buyHistoric('${key}')">购买贴纸</button>`}</div>`;
+  }
+  s+='<div class="small-note">苏联 / 民主德国 / 联邦德国 / 中华民国(1912-1949) / 法兰西第四共和国 —— 历史收藏品</div>';
+  el.innerHTML=s;
+}
+
+function renderPassport(){
+  const el=document.getElementById('passport-grid');
+  if(!el)return;
+  const g=G;
+  const cells=[];
+  for(let i=0;i<12;i++){
+    const st=g.stickers.find(s=>s.pos===i);
+    if(!st){cells.push(`<div class="cell empty" onclick="passportClick(null,${i})">空</div>`);continue;}
+    const color=st.kind==='passport'?PASSPORTS.find(p=>p.id===st.key)?.color||'#555':(HISTORIC[st.key]?HISTORIC[st.key].color:COUNTRIES[st.key]?.color||'#555');
+    const code=st.kind==='passport'?'护照':(HISTORIC[st.key]?'历史':'签证');
+    cells.push(`<div class="cell ${selSticker===st.key?'sel':''}" onclick="passportClick('${st.key}',${i})"><div class="cd" style="background:${color}"><b>${st.key.length>6?st.key.slice(0,5)+'…':st.key}</b><small>${code}${st.key==='中国'&&g.passport==='台湾地区'&&st.kind==='visa'?'(台胞证)':''}</small></div></div>`);
+  }
+  el.innerHTML=cells.join('');
+}
+let selSticker=null;
+function passportClick(key,pos){
+  if(key===null){if(selSticker){const st=G.stickers.find(s=>s.key===selSticker);if(st){if(st.key===G.passport&&st.pos===0){toast('出生国护照贴纸固定在第 1 格');selSticker=null;renderPassport();return;}st.pos=pos;selSticker=null;renderPassport();saveGame();checkAchievements();toast('📖 贴纸已移动到新位置');}}return;}
+  if(key===G.passport&&G.stickers.find(s=>s.key===key).pos===0){toast('出生国护照贴纸固定在第 1 格');return;}
+  if(selSticker===null){selSticker=key;renderPassport();}
+  else if(selSticker===key){selSticker=null;renderPassport();}
+  else{
+    const a=G.stickers.find(s=>s.key===selSticker),b=G.stickers.find(s=>s.key===key);
+    if(a&&b){const t=a.pos;a.pos=b.pos;b.pos=t;}
+    selSticker=null;renderPassport();saveGame();checkAchievements();
+  }
+}
+
+function renderChallenges(){
+  const el=document.getElementById('challenge-body');
+  if(!el)return;
+  const g=G;
+  document.getElementById('ch-ov').textContent=g.unlocked.size+'/32';
+  let s='';
+  for(const ser of SERIES){
+    const list=ACHIEVEMENTS.filter(a=>a.series===ser.id);
+    const done=list.filter(a=>g.unlocked.has(a.id)).length;
+    s+=`<div class="series-box"><div class="series-head" onclick="toggleSeries('${ser.id}')"><h3>${ser.name}</h3><span class="sc">${done}/${list.length}</span></div><div class="series-body" id="sb-${ser.id}"><div class="ach-grid">`;
+    for(const a of list){
+      const u=g.unlocked.has(a.id);
+      s+=`<div class="ach-card ${u?'unlocked':''}"><div class="ic">${a.icon}</div><div class="at">${a.title}</div><div class="ad">${a.desc}</div></div>`;
+    }
+    s+='</div></div></div>';
+  }
+  el.innerHTML=s;
+}
+function toggleSeries(id){
+  const b=document.getElementById('sb-'+id);
+  b.classList.toggle('collapsed');
+}
+function openPassport(){document.getElementById('passport-modal').classList.remove('hidden');renderPassport();}
+function closePassport(){document.getElementById('passport-modal').classList.add('hidden');selSticker=null;}
+function openChallenges(){document.getElementById('challenge-modal').classList.remove('hidden');renderChallenges();}
+function closeChallenges(){document.getElementById('challenge-modal').classList.add('hidden');}
+function openEntryModal(city){
+  const g=G,country=countryOfCity(city);
+  const pol=currentVisaPolicy(g,country);
+  const c=COUNTRIES[country];
+  const el=document.getElementById('entry-body');
+  let s=`<div class="entry-box"><div class="big">🛃 ${city} · ${country}</div><div class="pol">当前身份：${g.passport}护照${g.hukou!=='普通'?'（'+g.hukou+'户籍）':''}</div>`;
+  if(pol==='free'){s+=`<div class="pol" style="color:var(--green)">✅ 免签入境</div><div class="fee">费用：免费</div>`;}
+  else if(pol==='arrival'){s+=`<div class="pol" style="color:var(--orange)">🛂 落地签（可现场办理）</div><div class="fee">费用：${fmtMoney(c.cost)}</div>`;}
+  else if(hasVisa(g,country)){s+=`<div class="pol" style="color:var(--green)">✅ 已持有 ${country} 签证</div>`;}
+  else{s+=`<div class="pol" style="color:var(--red)">⛔ 未持有 ${country} 签证</div><div class="fee">正常入境将被拒绝，但可以硬闯（成功率40%，失败罚款¥5,000遣返）</div>`;}
+  s+='</div>';
+  s+='<div style="margin-bottom:10px"><div style="color:var(--dim);font-size:.9em;margin-bottom:6px">入境目的：</div><div class="purpose-row">';
+  for(const p of ['旅游','商务','外交']){
+    s+=`<button class="purpose-btn ${selPurpose===p?'sel':''}" onclick="setPurpose('${p}')">${p}</button>`;
+  }
+  s+='</div><div class="small-note">💼 选择"外交"入境可解锁成就「临时工」。</div></div>';
+  if(pol==='free'||pol==='arrival'||hasVisa(g,country)){
+    s+=`<button class="btn primary" style="width:100%;margin-bottom:6px" onclick="performEntry('legal')">✅ 正常入境${pol==='arrival'?'（支付落地签费用）':''}</button>`;
+  }
+  if(pol==='required'&&!hasVisa(g,country)){
+    s+=`<button class="btn danger" style="width:100%;margin-bottom:6px" onclick="performEntry('illegal')">🕳️ 硬闯入境（40%）</button>`;
+    s+=`<button class="btn" style="width:100%;margin-bottom:6px" onclick="closeEntry();switchTab('visa')">去签证中心申请签证</button>`;
+  }
+  s+=`<button class="btn" style="width:100%" onclick="performEntry('cancel')">取消出行（留在 ${g.city}）</button>`;
+  el.innerHTML=s;
+  document.getElementById('entry-modal').classList.remove('hidden');
+}
+function closeEntry(){document.getElementById('entry-modal').classList.add('hidden');}
+
+function showVictory(){
+  if(!document.getElementById('victory').classList.contains('hidden'))return;
+  document.getElementById('victory').classList.remove('hidden');
+}
+function closeVictory(){document.getElementById('victory').classList.add('hidden');}
+
+/* =====================================================
+   存档
+===================================================== */
+const SAVE_KEY='globalPassportSave_v1';
+function saveGame(){
+  if(!G)return;
+  try{
+    const data={...G,date:G.date.toISOString(),visitedCities:[...G.visitedCities],visitedCountries:[...G.visitedCountries],visitedCont:[...G.visitedCont],landmarks:[...G.landmarks],transitStamps:[...G.transitStamps],unlocked:[...G.unlocked]};
+    localStorage.setItem(SAVE_KEY,JSON.stringify(data));
+  }catch(e){console.warn('save failed',e);}
+}
+function loadGame(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return false;
+    const d=JSON.parse(raw);
+    G={...d,date:new Date(d.date),visitedCities:new Set(d.visitedCities),visitedCountries:new Set(d.visitedCountries),visitedCont:new Set(d.visitedCont),landmarks:new Set(d.landmarks),transitStamps:new Set(d.transitStamps),unlocked:new Set(d.unlocked)};
+    return true;
+  }catch(e){console.warn('load failed',e);return false;}
+}
+
+/* =====================================================
+   启动
+===================================================== */
+function initStart(){
+  const row=document.getElementById('flag-row');
+  let s='';
+  for(const p of PASSPORTS){
+    s+=`<div class="flag-card" id="fc-${p.id}" onclick="selectFlag('${p.id}')"><div class="flag-dot" style="background:${p.color}"></div><b>${p.id}</b><small>${p.city}</small><small>${p.note}</small></div>`;
+  }
+  row.innerHTML=s;
+}
+let selFlag='中国';
+function selectFlag(id){
+  selFlag=id;
+  document.querySelectorAll('.flag-card').forEach(el=>el.classList.toggle('sel',el.id==='fc-'+id));
+  document.getElementById('hukou-wrap').classList.toggle('hidden',id!=='中国');
+  if(id!=='中国')selHukou='普通';
+  renderHukou();
+}
+let selHukou='普通';
+function renderHukou(){
+  const row=document.getElementById('hukou-row');
+  let s='';
+  for(const h of ['普通','福建','广东','海南']){
+    s+=`<button class="hukou-btn ${selHukou===h?'sel':''}" onclick="selHukou='${h}';renderHukou()">${h==='普通'?'普通户籍':'🗺️ '+h}</button>`;
+  }
+  row.innerHTML=s;
+}
+
+function startGame(){
+  newGame(selFlag,selFlag==='中国'?selHukou:'普通');
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.remove('hidden');
+  renderAll();
+  toast('🌍 旅程开始！你在 '+G.city+'（'+G.passport+'护照）');
+}
+function continueGame(){
+  if(!loadGame())return;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.remove('hidden');
+  renderAll();
+  toast('🔄 已读取存档');
+}
+function confirmNewGame(){
+  if(confirm('确定要放弃当前旅程重新开始吗？进度将被覆盖。')){startGame();}
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  initStart();
+  renderHukou();
+  document.getElementById('btn-start').addEventListener('click',startGame);
+  document.getElementById('btn-continue').addEventListener('click',continueGame);
+  if(localStorage.getItem(SAVE_KEY))document.getElementById('btn-continue').classList.remove('hidden');
+  document.querySelectorAll('.modal-bg').forEach(m=>{m.addEventListener('click',function(e){if(e.target===m){m.classList.add('hidden');}});});
+  switchTab('travel');
+});
+</script>
 </body>
 </html>
